@@ -1,10 +1,11 @@
-import { Controller, Get } from '@nestjs/common';
-import { EventPattern } from '@nestjs/microservices';
+import { Controller, Get, Inject, OnModuleInit } from '@nestjs/common';
+import { ClientKafka, EventPattern } from '@nestjs/microservices';
 import { AppService } from './app.service';
 
 @Controller()
-export class AppController {
-	constructor(private readonly appService: AppService) {}
+export class AppController implements OnModuleInit {
+	constructor(private readonly appService: AppService,
+		@Inject('AUTH_SERVICE') private readonly authClient: ClientKafka) {}
 
 	@Get()
 	getHello(): string {
@@ -13,6 +14,10 @@ export class AppController {
 
 	@EventPattern('order_created')
 	handleOrderCreated(data: any) {
-		this.appService.handleOrderCreated(data.value);
+		return this.appService.handleOrderCreated(data.value);
+	}
+
+	onModuleInit() {
+		this.authClient.subscribeToResponseOf('get_user');
 	}
 }
