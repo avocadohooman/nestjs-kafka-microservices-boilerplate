@@ -10,6 +10,6 @@ export class CreateOrderEvent {
 			orderId: this.orderId,
 			userId: this.userid,
 			price: this.price,
-		});
+		})
 	}
 }
